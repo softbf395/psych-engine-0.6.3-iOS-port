@@ -112,9 +112,10 @@ jobs:
 
       - name: Installing Libraries
         run: |
-          haxelib setup ~/haxelib
-          haxelib --quiet install hxcpp > /dev/null
-          haxe -cp ./actions -D analyzer-optimize -main Main --interp
+          haxelib install format
+          haxelib install hxcpp --quiet
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
 
       - name: Building iOS (${{ matrix.build_type }})
         run: |
