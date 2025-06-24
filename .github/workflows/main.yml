@@ -48,12 +48,21 @@ jobs:
 
       - name: Installing Libraries
         run: |
+          set -euxo pipefail # Exit immediately if a command exits with a non-zero status.
+          echo "Setting up haxelib path..."
           haxelib setup ~/haxelib
-          haxelib --quiet install hxcpp > /dev/null
+          echo "Haxelib setup complete. Listing haxelib paths:"
+          haxelib path
+          echo "Installing hxcpp..."
+          haxelib install hxcpp # Removed > /dev/null to see output
+          echo "hxcpp installed. Listing installed haxelibs:"
+          haxelib list
+          echo "Running Haxe analyzer..."
           haxe -cp ./actions -D analyzer-optimize -main Main --interp
 
       - name: Configure Android
         run: |
+          set -euxo pipefail
           haxelib run lime setup -alias -y
           haxelib run lime config ANDROID_SDK $ANDROID_HOME
           haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
@@ -64,6 +73,7 @@ jobs:
 
       - name: Building Android (${{ matrix.build_type }})
         run: |
+          set -euxo pipefail
           haxelib run lime build android ${{ matrix.build_type == 'debug' && '-debug' || '' }} --app-version="4.0.0-${{ github.run_id}}"
 
       - name: Upload Android Artifact (${{ matrix.build_type }})
@@ -94,7 +104,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+        uses: krdlab/setup-haxe@v1.2.0
         with:
           haxe-version: 4.2.5
 
@@ -112,13 +122,21 @@ jobs:
 
       - name: Installing Libraries
         run: |
-          haxelib install format
-          haxelib install hxcpp --quiet
-          haxelib install hmm --quiet
-          haxelib run hmm install --quiet
+          set -euxo pipefail # Exit immediately if a command exits with a non-zero status.
+          echo "Setting up haxelib path..."
+          haxelib setup ~/haxelib
+          echo "Haxelib setup complete. Listing haxelib paths:"
+          haxelib path
+          echo "Installing hxcpp..."
+          haxelib install hxcpp # Removed > /dev/null to see output
+          echo "hxcpp installed. Listing installed haxelibs:"
+          haxelib list
+          echo "Running Haxe analyzer..."
+          haxe -cp ./actions -D analyzer-optimize -main Main --interp
 
       - name: Building iOS (${{ matrix.build_type }})
         run: |
+          set -euxo pipefail
           haxelib run lime build ios ${{ matrix.build_type == 'debug' && '-debug' || '' }} --app-version="4.0.0-${{ github.run_id}}"
 
       - name: Upload iOS Artifact (${{ matrix.build_type }})
